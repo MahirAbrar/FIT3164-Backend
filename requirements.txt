@@ -1,9 +1,0 @@
-boto3
-Flask
-Flask-Cors
-matplotlib
-numpy
-pandas
-python-dotenv
-scikit-learn
-tqdm
