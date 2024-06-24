@@ -11,3 +11,4 @@ demand.csv
 credentials.json
 __pycache__/
 
+.env

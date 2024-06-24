@@ -3,6 +3,8 @@ import boto3
 import json
 import pandas as pd
 import ast
+from dotenv import load_dotenv
+import os
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -14,6 +16,10 @@ import priceOptimization
 
 app = Flask(__name__)
 CORS(app)
+
+load_dotenv()
+
+
 
 stores = {
     'st1Cal': 'CA_1',
@@ -28,11 +34,9 @@ stores = {
     'st3Win': 'WI_3',
 }
 
-# Get access key
-credentials = json.load(open('credentials.json'))
-
-access_key = credentials.get('aws_access_key_id')
-secret_key = credentials.get('aws_secret_access_key')
+# Get the credentials
+access_key = os.getenv('AWS_ACCESS_KEY_ID')
+secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 s3 = boto3.resource(
     service_name='s3',
