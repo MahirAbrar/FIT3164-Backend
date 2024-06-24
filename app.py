@@ -63,6 +63,12 @@ priceDF['basePrice_onlyEvent'] = priceDF['basePrice_onlyEvent'].apply(ast.litera
 priceDF['basePrice_onlySNAP'] = priceDF['basePrice_onlySNAP'].apply(ast.literal_eval)
 priceDF['Price Count'] = priceDF['Price Count'].apply(ast.literal_eval)
 
+@app.route('/', methods=['GET'])
+def home():
+    return "Welcome to the Price Elasticity API for the M5 Dataset from Walmart!"
+
+
+
 # get all items from a store
 # run this in the browser: http://127.0.0.1:5000/get-items/st1Cal . This will return all the items in store 1 in California. Make sure the application is running using flask run
 @app.route('/get-items/<storeId>', methods=['GET'])
