@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 
 from selectLevel import levelSelection, getProductInfo
 from getData import getBase, getYearList
+from secret_manager import get_access_key, get_secret_key
 
 __author__ = "Hamid Abrar Mahir (32226136), Setyawan Prayogo (32213816), Yuan She (32678304), Regina Lim (32023863)"
 
@@ -71,20 +72,7 @@ def createModel(priceDF, year: int, store_id: str, item_id: str, event: bool, sn
     y_test_predicted = poly_reg_model.predict(X_test)
     rmse = np.sqrt(mean_squared_error(y_test, y_test_predicted))
     score = poly_reg_model.score(X_test, y_test)
-    # print("RMSE:", rmse)
-    # print("score:", score)
-    
-    # plt.figure(figsize=(10, 6))
-    # plt.scatter(x['priceDiscount'], y, color='goldenrod',label='Actual Data')
-    # plt.plot(x_values, y_predicted, color="red", label='Polynomial Regression')
-    # plt.plot(np.arange(0, 101), np.arange(0, 101), color='green', linestyle='--', label='Price Elasticity = 1')
-    # plt.title(f"Price Elasticity Analysis for {item_id} in Store {store_id} at {level} Level")
-    # plt.xlabel('Price Discount (%)')
-    # plt.ylabel('Change in Demand (%)')
-    # plt.legend()
-    #* Uncomment the next line if you want to work with backend
-    #* Comment the next line if you want to work with frontend
-    # plt.show()
+
             
     return poly, poly_reg_model, rmse, score, x['priceDiscount'].values, y.values, x_values, y_predicted
 
@@ -132,11 +120,8 @@ def getDataset(year, event: bool, snap: bool):
     filePath = f"modelData/data_{year}.csv"
     
     # Get access key
-    with open('credentials.json') as f:
-        credentials = json.load(f)
-
-    access_key = credentials.get('aws_access_key_id')
-    secret_key = credentials.get('aws_secret_access_key')
+    access_key = get_access_key()
+    secret_key = get_secret_key()
 
     s3 = boto3.resource(
         service_name='s3',
@@ -175,10 +160,9 @@ def filterData(data, productInfo, level: str):
     
 if __name__ == '__main__':
     # Get access key
-    credentials = json.load(open('credentials.json'))
 
-    access_key = credentials.get('aws_access_key_id')
-    secret_key = credentials.get('aws_secret_access_key')
+    access_key = get_access_key()
+    secret_key = get_secret_key()
 
     s3 = boto3.resource(
         service_name='s3',

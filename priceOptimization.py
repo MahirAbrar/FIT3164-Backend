@@ -7,6 +7,7 @@ import numpy as np
 
 from priceElasticityModel import createModel, predictDemand
 from getData import getBase, getYearList
+from secret_manager import get_access_key, get_secret_key
 
 def getOptimizedPrice(revenueList, stockCost):
     if revenueList == []:
@@ -98,11 +99,8 @@ def getDummyData(year: int):
     filePath = f"dummyData/data_{year}.csv"
     
     # Get access key
-    with open('credentials.json') as f:
-        credentials = json.load(f)
-
-    access_key = credentials.get('aws_access_key_id')
-    secret_key = credentials.get('aws_secret_access_key')
+    access_key = get_access_key()
+    secret_key = get_secret_key()
 
     s3 = boto3.resource(
         service_name='s3',
@@ -127,10 +125,8 @@ def getCostStock(dummyData, store_id: str, item_id: str):
 
 if __name__ == '__main__':
     # Get access key
-    credentials = json.load(open('credentials.json'))
-
-    access_key = credentials.get('aws_access_key_id')
-    secret_key = credentials.get('aws_secret_access_key')
+    access_key = get_access_key()
+    secret_key = get_secret_key
 
     s3 = boto3.resource(
         service_name='s3',

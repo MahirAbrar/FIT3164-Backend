@@ -1,10 +1,10 @@
 # import dataTransformation
 import boto3
-import json
 import pandas as pd
 import ast
 from dotenv import load_dotenv
 import os
+from secret_manager import get_secret, get_access_key, get_secret_key
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -18,8 +18,6 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
-
-
 
 stores = {
     'st1Cal': 'CA_1',
@@ -35,9 +33,10 @@ stores = {
 }
 
 # Get the credentials
-access_key = os.getenv('AWS_ACCESS_KEY_ID')
-secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+access_key = get_access_key()
+secret_key = get_secret_key()
 
+print(access_key, secret_key)
 s3 = boto3.resource(
     service_name='s3',
     region_name='ap-southeast-2',
@@ -271,32 +270,6 @@ def main():
     }
 
 
-
-# Uncomment this code when you want to work on the backend only
-"""
-def main():   
-    print("#############################################")
-
-    year = 2015
-    store_id = 'CA_1'
-    item_id = 'FOODS_1_001'
-    
-    base_price, base_demand = priceElasticityModel.getBase(salesDF, priceDF, year, store_id, item_id)
-    
-    poly, model, rmse = priceElasticityModel.createModel(salesDF, priceDF, year, store_id, item_id, deg = 3)
-
-    y_predict = priceElasticityModel.predictDemand(poly, model, 60)
-    
-    print("Printing the results", base_price, base_demand, rmse, y_predict)
-    return {'base_price': base_price, 'base_demand': base_demand, 'rmse': rmse, 'y_predict': y_predict}
-"""
-
-
-# for testing with frontend
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-# For testing with backend
-# if __name__ == '__main__':
-#     main()

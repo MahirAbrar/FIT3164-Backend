@@ -9,6 +9,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
+from secret_manager import get_access_key, get_secret_key
 from selectLevel import levelSelection, getProductInfo
 from getData import getBase, getYearList
 from priceElasticityModel import createModel
@@ -49,10 +50,8 @@ def testModel(priceDF, data, year: int):
 
 if __name__ == '__main__':
      # Get access key
-    credentials = json.load(open('credentials.json'))
-
-    access_key = credentials.get('aws_access_key_id')
-    secret_key = credentials.get('aws_secret_access_key')
+    access_key = get_access_key()
+    secret_key = get_secret_key()
 
     s3 = boto3.resource(
         service_name='s3',

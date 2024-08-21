@@ -5,6 +5,7 @@ import ast
 
 from selectLevel import getProductInfo
 from getData import getBase
+from secret_manager import get_access_key, get_secret_key
 
 import unittest
 from priceElasticityModel import createModel, predictDemand, priceElasticity, getDataset, filterData
@@ -12,10 +13,9 @@ from priceElasticityModel import createModel, predictDemand, priceElasticity, ge
 __author__ = "Hamid Abrar Mahir (32226136), Setyawan Prayogo (32213816), Yuan She (32678304), Regina Lim (32023863)"
 
 # Get access key
-credentials = json.load(open('credentials.json'))
 
-access_key = credentials.get('aws_access_key_id')
-secret_key = credentials.get('aws_secret_access_key')
+access_key = get_access_key()
+secret_key = get_secret_key()
 
 s3 = boto3.resource(
     service_name='s3',

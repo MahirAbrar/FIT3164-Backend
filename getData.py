@@ -2,6 +2,7 @@ import boto3
 import json
 import pandas as pd
 import ast
+from secret_manager import get_access_key, get_secret_key
 
 __author__ = "Hamid Abrar Mahir (32226136), Setyawan Prayogo (32213816), Yuan She (32678304), Regina Lim (32023863)"
 
@@ -65,10 +66,8 @@ def getColumnName(event: bool, snap: bool):
 
 if __name__ == '__main__':
     # Get access key
-    credentials = json.load(open('credentials.json'))
-
-    access_key = credentials.get('aws_access_key_id')
-    secret_key = credentials.get('aws_secret_access_key')
+    access_key = get_access_key()
+    secret_key = get_secret_key()
 
     s3 = boto3.resource(
         service_name='s3',
