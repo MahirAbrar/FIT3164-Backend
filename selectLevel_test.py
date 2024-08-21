@@ -23,7 +23,7 @@ s3 = boto3.resource(
     aws_secret_access_key=secret_key
 )
 
-priceDF = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object('price.csv').get()['Body'])
+priceDF = pd.read_csv(s3.Bucket(name='fit3164bucket').Object('price.csv').get()['Body'])
 
 priceDF['basePrice_withoutBoth'] = priceDF['basePrice_withoutBoth'].apply(ast.literal_eval)
 priceDF['basePrice_withBoth'] = priceDF['basePrice_withBoth'].apply(ast.literal_eval)
@@ -31,9 +31,9 @@ priceDF['basePrice_onlyEvent'] = priceDF['basePrice_onlyEvent'].apply(ast.litera
 priceDF['basePrice_onlySNAP'] = priceDF['basePrice_onlySNAP'].apply(ast.literal_eval)
 priceDF['Price Count'] = priceDF['Price Count'].apply(ast.literal_eval)
 
-data_2011 = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object("modelData/data_2011.csv").get()['Body'])
-data_2013 = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object("modelData/data_2013.csv").get()['Body'])
-data_2014 = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object("modelData/data_2014.csv").get()['Body'])
+data_2011 = pd.read_csv(s3.Bucket(name='fit3164bucket').Object("modelData/data_2011.csv").get()['Body'])
+data_2013 = pd.read_csv(s3.Bucket(name='fit3164bucket').Object("modelData/data_2013.csv").get()['Body'])
+data_2014 = pd.read_csv(s3.Bucket(name='fit3164bucket').Object("modelData/data_2014.csv").get()['Body'])
 
 class TestSelectLevel(unittest.TestCase):
     def test_getProductInfo(self):

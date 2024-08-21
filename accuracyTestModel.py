@@ -61,7 +61,7 @@ if __name__ == '__main__':
         aws_secret_access_key=secret_key
     )
     
-    priceDF = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object('price.csv').get()['Body'])
+    priceDF = pd.read_csv(s3.Bucket(name='fit3164bucket').Object('price.csv').get()['Body'])
     
     priceDF['basePrice_withoutBoth'] = priceDF['basePrice_withoutBoth'].apply(ast.literal_eval)
     priceDF['basePrice_withBoth'] = priceDF['basePrice_withBoth'].apply(ast.literal_eval)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     
     for year in range(2011, 2017):
         filePath = f"modelData/data_{year}.csv"
-        data = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object(filePath).get()['Body'])
+        data = pd.read_csv(s3.Bucket(name='fit3164bucket').Object(filePath).get()['Body'])
         
         testData = testModel(priceDF, data, year)
         testData.to_csv(f"accuracyTestData/data_{year}.csv", index=False)

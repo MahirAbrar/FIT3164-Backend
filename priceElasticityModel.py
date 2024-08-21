@@ -145,7 +145,7 @@ def getDataset(year, event: bool, snap: bool):
         aws_secret_access_key=secret_key
     )
         
-    data = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object(filePath).get()['Body'])
+    data = pd.read_csv(s3.Bucket(name='fit3164bucket').Object(filePath).get()['Body'])
         
     if event == False and snap == False:
         data = data[(data['eventCount'] == 0 ) & (data['snapCount'] == 0)].reset_index(drop=True)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
         aws_secret_access_key=secret_key
     )
     
-    demandDF = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object('demand.csv').get()['Body'])
+    demandDF = pd.read_csv(s3.Bucket(name='fit3164bucket').Object('demand.csv').get()['Body'])
     
     demandDF['withoutBoth'] = demandDF['withoutBoth'].apply(ast.literal_eval)
     demandDF['withBoth'] = demandDF['withBoth'].apply(ast.literal_eval)
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     demandDF['start_date'] = pd.to_datetime(demandDF['start_date'])
     demandDF['end_date'] = pd.to_datetime(demandDF['end_date'])
     
-    priceDF = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object('price.csv').get()['Body'])
+    priceDF = pd.read_csv(s3.Bucket(name='fit3164bucket').Object('price.csv').get()['Body'])
     
     priceDF['basePrice_withoutBoth'] = priceDF['basePrice_withoutBoth'].apply(ast.literal_eval)
     priceDF['basePrice_withBoth'] = priceDF['basePrice_withBoth'].apply(ast.literal_eval)

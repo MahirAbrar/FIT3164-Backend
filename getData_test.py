@@ -20,7 +20,7 @@ s3 = boto3.resource(
     aws_access_key_id=access_key,
     aws_secret_access_key=secret_key
 )
-demandDF = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object('demand.csv').get()['Body'])
+demandDF = pd.read_csv(s3.Bucket(name='fit3164bucket').Object('demand.csv').get()['Body'])
 
 demandDF['withoutBoth'] = demandDF['withoutBoth'].apply(ast.literal_eval)
 demandDF['withBoth'] = demandDF['withBoth'].apply(ast.literal_eval)
@@ -30,7 +30,7 @@ demandDF['onlySNAP'] = demandDF['onlySNAP'].apply(ast.literal_eval)
 demandDF['start_date'] = pd.to_datetime(demandDF['start_date'])
 demandDF['end_date'] = pd.to_datetime(demandDF['end_date'])
 
-priceDF = pd.read_csv(s3.Bucket(name='fit3164-bucket').Object('price.csv').get()['Body'])
+priceDF = pd.read_csv(s3.Bucket(name='fit3164bucket').Object('price.csv').get()['Body'])
 
 priceDF['basePrice_withoutBoth'] = priceDF['basePrice_withoutBoth'].apply(ast.literal_eval)
 priceDF['basePrice_withBoth'] = priceDF['basePrice_withBoth'].apply(ast.literal_eval)
