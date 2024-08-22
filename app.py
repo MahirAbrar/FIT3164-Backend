@@ -4,7 +4,7 @@ import pandas as pd
 import ast
 from dotenv import load_dotenv
 import os
-from secret_manager import get_secret, get_access_key, get_secret_key
+from secret_manager import get_access_key, get_secret_key, get_item
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -36,7 +36,6 @@ stores = {
 access_key = get_access_key()
 secret_key = get_secret_key()
 
-print(access_key, secret_key)
 s3 = boto3.resource(
     service_name='s3',
     region_name='ap-southeast-2',
@@ -62,6 +61,22 @@ priceDF['basePrice_onlyEvent'] = priceDF['basePrice_onlyEvent'].apply(ast.litera
 priceDF['basePrice_onlySNAP'] = priceDF['basePrice_onlySNAP'].apply(ast.literal_eval)
 priceDF['Price Count'] = priceDF['Price Count'].apply(ast.literal_eval)
 
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    print("Trying to fetch item")
+    trial = get_item('get-price-elasticity?storeId=st1Cal&itemId=FOODS_1_001&yearId=2015&event=True&snap=False&eventCount=1&snapCount=0&disId=10')
+    print(trial)
+    return "trying"
+
+@app.route('/test2', methods=['GET'])
+def test2():
+    print("Trying to fetch item")
+    trial = get_item('asdasd')
+    print(trial)
+    return "trying"
+
 @app.route('/', methods=['GET'])
 def home():
     return "Welcome to the Price Elasticity API for the M5 Dataset from Walmart!"
@@ -73,7 +88,6 @@ def home():
 @app.route('/get-items/<storeId>', methods=['GET'])
 def getItems(storeId):
     storeId = stores.get(storeId, "Could not find store")
-    print(storeId)
 
     # only show the unique items in the store
     items = demandDF[demandDF['store_id'] == storeId]['item_id'].unique()
