@@ -101,6 +101,30 @@ class DynamoDBManager:
             return f"An unexpected error occurred: {str(e)}"
 
 
+    # TODO
+    # requires key and all the values
+    def put_item(self, item):
+        """
+        Put an item into the DynamoDB table.
+        """
+        try:
+            # tofix
+            response = self.table.put_item(Item=item)
+            return response
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            error_message = e.response['Error']['Message']
+            
+            if error_code == 'ResourceNotFoundException':
+                return "Table not found"
+            elif error_code == 'ProvisionedThroughputExceededException':
+                return "Throughput exceeded"
+            else:
+                return f"An error occurred: {error_message}"
+                
+        except Exception as e:
+            return f"An unexpected error occurred: {str(e)}"
+
 
 
 dynamodb_manger = DynamoDBManager()
