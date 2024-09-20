@@ -64,6 +64,7 @@ def get_access_key():
 def get_secret_key():
     return secret_manager.get_secret_key()
 
+# Caching
 class DynamoDBManager:
     def __init__(self):
         self.dynamodb = boto3.resource('dynamodb',
@@ -81,9 +82,14 @@ class DynamoDBManager:
         try:
             response = self.table.get_item(Key={"input": key})
             
+            # response data is in the 'Item' key
+            #{'Item': {'input': 'get-price-elasticity?storeId=st1Cal&itemId=FOODS_1_001&yearId=2015&event=True&snap=False&eventCount=1&snapCount=0&disId=10', 'aaaa': True, 'test': 'test'}}
             if 'Item' in response:
+                # found item
+                print(response)
                 return response['Item']
             else:
+                print("could not find item")
                 return "not available"
                 
         except ClientError as e:
@@ -101,14 +107,16 @@ class DynamoDBManager:
             return f"An unexpected error occurred: {str(e)}"
 
 
-    # TODO
     # requires key and all the values
-    def put_item(self, item):
+    def put_item(self, key, data):
         """
         Put an item into the DynamoDB table.
         """
         try:
-            # tofix
+            item = {
+                "input": key,
+                "data": json.dumps(data)
+            }
             response = self.table.put_item(Item=item)
             return response
         except ClientError as e:
@@ -130,7 +138,7 @@ class DynamoDBManager:
 dynamodb_manger = DynamoDBManager()
 print(dynamodb_manger)
 
-def put_item(item):
+def put_item(key, data):
     return dynamodb_manger.put_item(item)
 
 def get_item(key):
