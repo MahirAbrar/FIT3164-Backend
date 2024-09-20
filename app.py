@@ -13,6 +13,8 @@ from flask import request
 import getData
 import priceElasticityModel
 import priceOptimization
+from urllib.parse import urlencode
+
 
 app = Flask(__name__)
 CORS(app)
@@ -145,7 +147,7 @@ def get_discount():
 
     storeId = stores.get(store_id, "Could not find store")
     cache_key = f'get-price-discount?storeId={store_id}&itemId={item_id}&yearId={year}&event={eventBool}&snap={snapBool}&eventCount={eventCount}&snapCount={snapCount}&disId={discount}'
-
+    
     cached_item = get_item(cache_key, "price_discount")
 
     if cached_item != "not available":
@@ -172,7 +174,7 @@ def get_discount():
         }
         
         # Store in cache
-        put_item(cache_key, 'price_discount', result)
+        cache_result = put_item(cache_key, 'price_discount', result)
         
         return result
     
@@ -211,66 +213,73 @@ def main():
     print(store_id, item_id, year, event, snap, eventCount, snapCount, discount)
     print("#############################################")
     
-    # To show in the Front-end
-    base_price, base_demand = getData.getBase(demandDF, priceDF, year-1, storeId, item_id, event, snap)
-    
-    # Not gonna show on UI
-    poly, model, rmse, score, x_priceDiscount, y_actual, x_values, y_predicted = priceElasticityModel.createModel(priceDF, year, storeId, item_id, event, snap, eventCount, snapCount)
-    
-    rmse = round(rmse, 2)
-
-    # 60 is the user input (discount)
-    # impact and demandText is for UI
-    # changeDemand, impact, demand, demandText = priceElasticityModel.predictDemand(poly, model, base_demand, discount, eventCount, snapCount)
-    
-    # elasticity, interpretation = priceElasticityModel.priceElasticity(discount, changeDemand)
-    
-    # Not gonna show on UI
-    costPrice, stockOnHand, revenueList, stockCost = priceOptimization.calculateRevenue(demandDF, priceDF, year, storeId, item_id, event, snap, eventCount, snapCount)
-    
-    discount, optimizedPrice, totalSold, totalRevenue, profitLoss, totalDay = priceOptimization.getOptimizedPrice(revenueList, stockCost)   
-
-    # For price elasticity section
-    print("Printing the results (Price Elasticity)", base_price, base_demand, rmse, score)
-    
-    # For price optimization
-    print("Printing the results (Price Optimization)", costPrice, stockOnHand, discount, optimizedPrice, totalSold, totalRevenue, profitLoss, totalDay)
-    
-    # print(x_priceDiscount, y_actual, x_values, y_predicted)
-    
-    return {
-        # Model
-        'Base Price': float(base_price),
-        'Base Demand': float(base_demand),
-        # RMSE (Root Mean Square Error) is a statistical measure used to quantify the average difference between observed values and predicted values
-        'RMSE': float(rmse),
-        # Measurement of the proportion of the variance in the dependent variable (target) that is predictable from the independent variables (features)
-        'Score': float(score),
-        
-        # # Discount
-        # 'Impact on Sales': str(impact),
-        # 'Predicted Demand': str(demandText),
-        # 'Elasticity Score': float(elasticity),
-        # 'Elasticity Interpretation': str(interpretation),
-        
-        # Price Optimization
-        'Cost Price/Item': float(costPrice),
-        'Stock on Hand': int(stockOnHand),
-        'Price Discount': str(int(discount)) + ' %',
-        'Optimized Price': float(optimizedPrice),
-        'Total item(s) sold': str(int(totalSold)) + ' Items',
-        'Total Revenue': float(totalRevenue),
-        'PROFIT/LOSS': str(profitLoss),
-        'Gain profit in (days)': int(totalDay),
-        
-        # Graph
-        # Scatter
-        'x_actual': x_priceDiscount.tolist(),
-        'y_actual': y_actual.tolist(),
-        # Line
-        'x_values': x_values.tolist(),
-        'y_predicted': y_predicted.tolist()
+    params = {
+        'storeId': store_id,
+        'itemId': item_id,
+        'yearId': year,
+        'event': eventBool,
+        'snap': snapBool,
+        'eventCount': eventCount,
+        'snapCount': snapCount,
+        'disId': discount
     }
+    cache_key = f'get-price-elasticity?{urlencode(params)}'
+
+    cached_item = get_item(cache_key, 'price_elasticity')
+
+    if cached_item != "not available":
+        return jsonify(cached_item)
+    else:
+
+        # To show in the Front-end
+        base_price, base_demand = getData.getBase(demandDF, priceDF, year-1, storeId, item_id, event, snap)
+        
+        # Not gonna show on UI
+        poly, model, rmse, score, x_priceDiscount, y_actual, x_values, y_predicted = priceElasticityModel.createModel(priceDF, year, storeId, item_id, event, snap, eventCount, snapCount)
+        
+        rmse = round(rmse, 2)
+
+        # 60 is the user input (discount)
+        # impact and demandText is for UI
+        # changeDemand, impact, demand, demandText = priceElasticityModel.predictDemand(poly, model, base_demand, discount, eventCount, snapCount)
+        
+        # elasticity, interpretation = priceElasticityModel.priceElasticity(discount, changeDemand)
+        
+        # Not gonna show on UI
+        costPrice, stockOnHand, revenueList, stockCost = priceOptimization.calculateRevenue(demandDF, priceDF, year, storeId, item_id, event, snap, eventCount, snapCount)
+        
+        discount, optimizedPrice, totalSold, totalRevenue, profitLoss, totalDay = priceOptimization.getOptimizedPrice(revenueList, stockCost)   
+
+        # For price elasticity section
+        print("Printing the results (Price Elasticity)", base_price, base_demand, rmse, score)
+        
+        # For price optimization
+        print("Printing the results (Price Optimization)", costPrice, stockOnHand, discount, optimizedPrice, totalSold, totalRevenue, profitLoss, totalDay)
+        
+        # print(x_priceDiscount, y_actual, x_values, y_predicted)
+        
+        result = {
+            'Base Price': float(base_price),
+            'Base Demand': float(base_demand),
+            'RMSE': float(rmse),
+            'Score': float(score),
+            'Cost Price/Item': float(costPrice),
+            'Stock on Hand': int(stockOnHand),
+            'Price Discount': str(int(discount)) + ' %',
+            'Optimized Price': float(optimizedPrice),
+            'Total item(s) sold': str(int(totalSold)) + ' Items',
+            'Total Revenue': float(totalRevenue),
+            'PROFIT/LOSS': str(profitLoss),
+            'Gain profit in (days)': int(totalDay),
+            'x_actual': x_priceDiscount.tolist(),
+            'y_actual': y_actual.tolist(),
+            'x_values': x_values.tolist(),
+            'y_predicted': y_predicted.tolist()
+        }
+
+        cache_result = put_item(cache_key, 'price_elasticity', result)
+
+        return jsonify(result)
 
 
 if __name__ == '__main__':
