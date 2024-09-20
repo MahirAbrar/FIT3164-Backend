@@ -121,7 +121,7 @@ class DynamoDBManager:
                 print("Could not find specific data for the item type")
                 return "not available"
             else:
-                print("Could not find item")
+                print("Could not find item: return not available")
                 return "not available"
                 
         except ClientError as e:
@@ -140,14 +140,57 @@ class DynamoDBManager:
         
 
     # requires key and all the values
-    def put_item(self, key, data):
+    def put_item(self, key, item_type, data):
         """
         Put an item into the DynamoDB table.
+        
+        :param key: The primary key of the item
+        :param item_type: Either 'price_discount' or 'price_elasticity'
+        :param data: The data to be stored
+        :return: Response from DynamoDB or error message
         """
+        print(f"Putting item for key: {key}, type: {item_type}")
         try:
+            # First, try to get the existing item
+            existing_item = self.table.get_item(Key={"input": key}).get('Item', {})
+            existing_data = json.loads(existing_item.get('data', '{}'))
+            
+            # Update the existing data with the new data
+            if item_type == 'price_discount':
+                print("updating cache data!!!!")
+                print("######################################")
+                existing_data.update({
+                    'Impact on Sales': data['Impact on Sales'],
+                    'Predicted Demand': data['Predicted Demand'],
+                    'Elasticity Score': data['Elasticity Score'],
+                    'Elasticity Interpretation': data['Elasticity Interpretation']
+                })
+            elif item_type == 'price_elasticity':
+                existing_data.update({
+                    'Base Price': data['Base Price'],
+                    'Base Demand': data['Base Demand'],
+                    'RMSE': data['RMSE'],
+                    'Score': data['Score'],
+                    'Cost Price/Item': data['Cost Price/Item'],
+                    'Stock on Hand': data['Stock on Hand'],
+                    'Price Discount': data['Price Discount'],
+                    'Optimized Price': data['Optimized Price'],
+                    'Total item(s) sold': data['Total item(s) sold'],
+                    'Total Revenue': data['Total Revenue'],
+                    'PROFIT/LOSS': data['PROFIT/LOSS'],
+                    'Gain profit in (days)': data['Gain profit in (days)'],
+                    'x_actual': data['x_actual'],
+                    'y_actual': data['y_actual'],
+                    'x_values': data['x_values'],
+                    'y_predicted': data['y_predicted']
+                })
+            else:
+                return f"Invalid item_type: {item_type}"
+
+            # Put the updated item back into the table
             item = {
                 "input": key,
-                "data": json.dumps(data)
+                "data": json.dumps(existing_data)
             }
             response = self.table.put_item(Item=item)
             return response
@@ -170,8 +213,8 @@ class DynamoDBManager:
 dynamodb_manger = DynamoDBManager()
 print(dynamodb_manger)
 
-def put_item(key, data):
-    return dynamodb_manger.put_item(item)
+def put_item(key, item_type, data):
+    return dynamodb_manger.put_item(key, item_type, data)
 
 def get_item(key, item_type):
     return dynamodb_manger.get_item(key, item_type)

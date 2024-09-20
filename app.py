@@ -149,6 +149,7 @@ def get_discount():
     cached_item = get_item(cache_key, "price_discount")
 
     if cached_item != "not available":
+        print("Returning cached item from price discount!!!!!!!!")
         return cached_item
     else:
     # Getting base price and base demand
@@ -171,7 +172,7 @@ def get_discount():
         }
         
         # Store in cache
-        # put_item(cache_key, result)
+        put_item(cache_key, 'price_discount', result)
         
         return result
     
